@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{box-sizing: border-box;}
+        a{text-decoration: none;color:inherit;}
+        .container{width: 700px;margin: 0 auto;text-align: center}
+        ul{padding: 0;margin:0 -10px;list-style: none;}
+        li{width: 33.3333%;float:left;padding: 10px;}
+        ul::after{clear: both;display: table;content: '';}
+        .content{width: 100%;height: 100%;}
+        .content:hover{box-shadow: 0 0 5px blue;}
+        .content img{width: 100%;height: 150px}
+        .content p,h4{padding: 0 10px;}
+        .pagebox a{
+            display: inline-block;
+            padding: 10px 15px ;
+            border-left:1px solid #ddd;
+            border-top:1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+        }
+        .pagebox a:first-child{
+            border-radius: 5px 0 0 5px;
+        }
+        .pagebox a:last-child{
+            border-radius:  0 5px 5px 0;
+            border-right:1px solid #ddd;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div>
+        条数：<input type="text" value="6" id="page-size">
+        <!--分页器显示数量<input type="text" value="10" id="pagination-size">-->
+        页码 <input type="text" id="page-index" value="1">
+        <input type="button" id="btn" value="生成分页">
+    </div>
+    <ul class="list" id="list">
+    </ul>
+    <div id="pagebox" class="pagebox">
+    </div>
+</div>
+
+<script id="template" type="text/tmpl">
+    <li>
+       <div class="content">
+       <img src="{cimgurl}" alt="">
+       <h4>{name}</h4>
+       <p>{cityname}</p>
+       <p><del>{mprice}</del>&nbsp;&nbsp;{price}</p>
+       </div>
+    </li>
+</script>
+<script src="data1.js"></script>
+<script>
+    //获取元素
+    var temp = document.getElementById('template').innerHTML;
+    var sizeP = document.getElementById('page-size');
+    var indexP = document.getElementById('page-index');
+    var pagebox = document.getElementById('pagebox');
+    var oUl = document.getElementById('list');
+
+    //声明分页变量
+    var size = 6, index = 1, count;//每页显示条数, //第几页, count//页数;
+
+    //分页器变量
+
+
+    showData();
+    createPage();
+
+    //分页按钮点击事件
+    document.getElementById('btn').onclick = function(){
+        size = parseInt(sizeP.value);
+        index = parseInt(indexP.value);
+        var len = data.length;
+        count = Math.ceil(len/size);
+        if(index > count){
+            alert('此页没有数据');
+            return 0;
+        }
+        showData();
+        createPage();
+    };
+
+    //创建分页器
+    function createPage(){
+        var boxSize = 5;//每页显示个数
+        var maxBox = Math.ceil(count/boxSize);//总共多少页
+        var boxIndex = Math.ceil(index/boxSize);//当前显示哪几页
+        var html = '';
+        for(var i = 1; i <= boxSize; i++){
+            var curr = (boxIndex - 1) * boxSize + i;
+            if(curr > count){
+                break;
+            }
+            html += ''.concat('<a href="#">'+ curr +'</a>')
+        }
+        if(boxIndex < maxBox){
+            html = ''.concat(html, '<a>'+ '&gt;&gt;' +'</a>')
+        }
+        if(boxIndex > 1){
+            html = ''.concat('<a>'+ '&lt;&lt;' +'</a>',html)
+        }
+        pagebox.innerHTML = html;
+    }
+
+    //显示数据
+    function showData(){
+        var list = data.slice((index - 1) * size, size * index);
+        oUl.innerHTML = '';
+        list.forEach(function(item){
+            oUl.innerHTML += temp.replace(/\{cimgurl\}/,item.cimgurl)
+                    .replace(/\{name\}/, item.name)
+                    .replace(/\{cityname\}/, item.cityname)
+                    .replace(/\{mprice\}/, item.mprice)
+                    .replace(/\{price\}/, item.price);
+        });
+    }
+
+</script>
+</body>
+</html>
